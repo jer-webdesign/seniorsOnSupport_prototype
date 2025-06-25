@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grocery Service</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .quantity-modal .modal-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .quantity-selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      margin: 30px 0;
+      font-size: 2.5rem;
+    }
+
+    .quantity-btn {
+      font-size: 2.5rem;
+      /* padding: 0.5em 1em; */
+    }
+
+    #quantityValue {
+      min-width: 50px;
+      text-align: center;
+    }
+
+    .modal button.ok-btn {
+      font-size: 1.5rem;
+      padding: 0.5em 1em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <button onclick="window.location.href='index.html'" class="back-button">← Back</button>
+  <h1 class="service-title">Grocery Service</h1>
+
+  <div class="container">
+    <div class="buttons">
+      <button class="add-btn" onclick="startAddItem('Milk')">Milk</button>
+      <button class="add-btn" onclick="startAddItem('Bread')">Bread</button>
+      <button class="add-btn" onclick="startAddItem('Eggs')">Eggs</button>
+      <button class="add-btn" onclick="startAddItem('Painkillers')">Painkillers</button>
+      <button class="add-btn" onclick="startAddItem('Vegetables')">Vegetables</button>
+    </div>
+
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <!-- Quantity Modal -->
+  <div class="modal quantity-modal" id="quantityModal" style="display:none">
+    <div class="modal-content">
+      <h3>How many <span id="itemName"></span>?</h3>
+      <div class="quantity-selector">
+        <button class="quantity-btn" onclick="adjustQuantity(-1)">–</button>
+        <div id="quantityValue">1</div>
+        <button class="quantity-btn" onclick="adjustQuantity(1)">+</button>
+      </div>
+      <button class="ok-btn" onclick="confirmQuantity()">OK</button>
+    </div>
+  </div>
+
+  <!-- Outros modais existentes -->
+  <div class="modal" id="calendarModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('calendarModal')">✖</button>
+      <h3>Select a date</h3>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="timeModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('timeModal')">✖</button>
+      <h3>Select a time for <span id="selectedDateDisplay"></span></h3>
+      <div class="time-grid" id="timeGrid"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    let currentItem = "";
+    let currentQty = 1;
+
+    function startAddItem(item) {
+      currentItem = item;
+      currentQty = 1;
+      document.getElementById("itemName").textContent = item;
+      document.getElementById("quantityValue").textContent = currentQty;
+      document.getElementById("quantityModal").style.display = "flex";
+    }
+
+    function adjustQuantity(change) {
+      currentQty = Math.max(1, currentQty + change);
+      document.getElementById("quantityValue").textContent = currentQty;
+    }
+
+    function confirmQuantity() {
+      document.getElementById("quantityModal").style.display = "none";
+      // continua o fluxo normal
+      openCalendarModal();
+    }
+
+    function openCalendarModal() {
+      document.getElementById("calendarModal").style.display = "flex";
+      // gerar calendário (mock)
+      const grid = document.getElementById("calendarGrid");
+      grid.innerHTML = "";
+      for (let i = 1; i <= 30; i++) {
+        const cell = document.createElement("div");
+        cell.className = "calendar-cell";
+        cell.textContent = i;
+        cell.onclick = () => selectDate(`2025-06-${String(i).padStart(2, '0')}`);
+        grid.appendChild(cell);
+      }
+    }
+
+    function selectDate(date) {
+      document.getElementById("calendarModal").style.display = "none";
+      document.getElementById("selectedDateDisplay").textContent = date;
+      openTimeModal();
+    }
+
+    function openTimeModal() {
+      document.getElementById("timeModal").style.display = "flex";
+      const grid = document.getElementById("timeGrid");
+      grid.innerHTML = "";
+      for (let h = 8; h <= 18; h++) {
+        const t = `${h.toString().padStart(2, '0')}:00`;
+        const btn = document.createElement("button");
+        btn.className = "time-button";
+        btn.textContent = t;
+        btn.onclick = () => selectTime(t);
+        grid.appendChild(btn);
+      }
+    }
+
+    function selectTime(time) {
+      document.getElementById("timeModal").style.display = "none";
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `<span>${currentItem} (x${currentQty}) – ${document.getElementById("selectedDateDisplay").textContent} at ${time}</span>
+                        <button class="remove-btn" onclick="this.parentElement.remove()">Remove</button>`;
+      document.getElementById("cards").appendChild(card);
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ride Service</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body onload="loadItems()">
+  <button onclick="window.location.href='index.html'"class="back-button">← Back</button>
+  <h1 class="service-title">Rides Service</h1>
+  <!-- <h1>Ride Service</h1> -->
+  <div class="container">
+    <div class="buttons"><button class="add-btn" onclick="addItem('Ride to doctor')">Ride to doctor</button><button class="add-btn" onclick="addItem('Ride to pharmacy')">Ride to pharmacy</button><button class="add-btn" onclick="addItem('Ride to family')">Ride to family</button></div>
+    <div class="cards" id="cards"></div>
+    
+  </div>
+
+  <div class="modal" id="calendarModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('calendarModal')">✖</button>
+      <h3>Select a date</h3>
+      <div class="calendar-grid"><div class="calendar-grid"><div class="calendar-header">Mon</div><div class="calendar-header">Tue</div><div class="calendar-header">Wed</div><div class="calendar-header">Thu</div><div class="calendar-header">Fri</div><div class="calendar-header">Sat</div><div class="calendar-header">Sun</div><div class="calendar-cell empty"></div><div class="calendar-cell empty"></div><div class="calendar-cell empty"></div><div class="calendar-cell empty"></div><div class="calendar-cell empty"></div><div class="calendar-cell empty"></div><div class="calendar-cell" onclick="selectDate(2025, 6, 1)">1</div><div class="calendar-cell" onclick="selectDate(2025, 6, 2)">2</div><div class="calendar-cell" onclick="selectDate(2025, 6, 3)">3</div><div class="calendar-cell" onclick="selectDate(2025, 6, 4)">4</div><div class="calendar-cell" onclick="selectDate(2025, 6, 5)">5</div><div class="calendar-cell" onclick="selectDate(2025, 6, 6)">6</div><div class="calendar-cell" onclick="selectDate(2025, 6, 7)">7</div><div class="calendar-cell" onclick="selectDate(2025, 6, 8)">8</div><div class="calendar-cell" onclick="selectDate(2025, 6, 9)">9</div><div class="calendar-cell" onclick="selectDate(2025, 6, 10)">10</div><div class="calendar-cell" onclick="selectDate(2025, 6, 11)">11</div><div class="calendar-cell" onclick="selectDate(2025, 6, 12)">12</div><div class="calendar-cell" onclick="selectDate(2025, 6, 13)">13</div><div class="calendar-cell" onclick="selectDate(2025, 6, 14)">14</div><div class="calendar-cell" onclick="selectDate(2025, 6, 15)">15</div><div class="calendar-cell" onclick="selectDate(2025, 6, 16)">16</div><div class="calendar-cell" onclick="selectDate(2025, 6, 17)">17</div><div class="calendar-cell" onclick="selectDate(2025, 6, 18)">18</div><div class="calendar-cell" onclick="selectDate(2025, 6, 19)">19</div><div class="calendar-cell" onclick="selectDate(2025, 6, 20)">20</div><div class="calendar-cell" onclick="selectDate(2025, 6, 21)">21</div><div class="calendar-cell" onclick="selectDate(2025, 6, 22)">22</div><div class="calendar-cell" onclick="selectDate(2025, 6, 23)">23</div><div class="calendar-cell" onclick="selectDate(2025, 6, 24)">24</div><div class="calendar-cell" onclick="selectDate(2025, 6, 25)">25</div><div class="calendar-cell" onclick="selectDate(2025, 6, 26)">26</div><div class="calendar-cell" onclick="selectDate(2025, 6, 27)">27</div><div class="calendar-cell" onclick="selectDate(2025, 6, 28)">28</div><div class="calendar-cell" onclick="selectDate(2025, 6, 29)">29</div><div class="calendar-cell" onclick="selectDate(2025, 6, 30)">30</div></div></div>
+    </div>
+  </div>
+
+  <div class="modal" id="timeModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('timeModal')">✖</button>
+      <h3>Select a time for <span id="selectedDateDisplay"></span></h3>
+      <div class="time-grid" id="timeGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentText = "";
+    let selectedDate = "";
+
+    function addItem(text) {
+      currentText = text;
+      document.getElementById("calendarModal").style.display = "flex";
+    }
+
+    function selectDate(year, month, day) {
+      const m = String(month).padStart(2, '0');
+      const d = String(day).padStart(2, '0');
+      selectedDate = `${year}-${m}-${d}`;
+      document.getElementById("calendarModal").style.display = "none";
+      document.getElementById("selectedDateDisplay").textContent = selectedDate;
+      showTimeModal();
+    }
+
+    function showTimeModal() {
+      const container = document.getElementById("timeGrid");
+      container.innerHTML = "";
+      for (let h = 8; h <= 18; h++) {
+        for (let m of [0, 30]) {
+          const hour = String(h).padStart(2, '0');
+          const min = String(m).padStart(2, '0');
+          const btn = document.createElement("button");
+          btn.className = "time-button";
+          btn.textContent = `${hour}:${min}`;
+          btn.onclick = () => confirmTime(`${hour}:${min}`);
+          container.appendChild(btn);
+        }
+      }
+      document.getElementById("timeModal").style.display = "flex";
+    }
+
+    function confirmTime(time) {
+      const fullText = `${currentText} — ${selectedDate} at ${time}`;
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const span = document.createElement("span");
+      span.textContent = fullText;
+
+      const btn = document.createElement("button");
+      btn.className = "remove-btn";
+      btn.textContent = "Remove";
+      btn.onclick = () => {
+        card.remove();
+        saveItems();
+      };
+
+      card.appendChild(span);
+      card.appendChild(btn);
+      document.getElementById("cards").appendChild(card);
+
+      document.getElementById("timeModal").style.display = "none";
+      saveItems();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+      currentText = "";
+      selectedDate = "";
+    }
+
+    function saveItems() {
+      const spans = document.querySelectorAll("#cards .card span");
+      const values = Array.from(spans).map(s => s.textContent);
+      sessionStorage.setItem("ride_items", JSON.stringify(values));
+    }
+
+    function loadItems() {
+      const saved = sessionStorage.getItem("ride_items");
+      if (!saved) return;
+      const items = JSON.parse(saved);
+      items.forEach(text => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const span = document.createElement("span");
+        span.textContent = text;
+
+        const btn = document.createElement("button");
+        btn.className = "remove-btn";
+        btn.textContent = "Remove";
+        btn.onclick = () => {
+          card.remove();
+          saveItems();
+        };
+
+        card.appendChild(span);
+        card.appendChild(btn);
+        document.getElementById("cards").appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
